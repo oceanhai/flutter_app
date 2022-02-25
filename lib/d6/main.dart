@@ -79,15 +79,30 @@ class MainPage extends StatelessWidget{
   //   );
   // }
 
-  //④ 路由 routes
+  //④ 路由 routes   MainPageDetailRouter
+  // @override
+  // Widget build(BuildContext context) {
+  //   return MaterialApp(
+  //     routes: {
+  //       //默认首页的路由地址就是/,如果路由表 包含/ 那就别指定home属性
+  //       "/":(_){
+  //         // return MainPageDetail();//TODO 擦 我发现这样依然也可以用以前的跳转
+  //         return MainPageDetailRouter();
+  //       },
+  //       "/page2":(_)=>Page2()
+  //     },
+  //     title: "第一个页面",
+  //   );
+  // }
+
+  //⑤ 页面跳转动画    MainPageDetailAnimation
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       routes: {
         //默认首页的路由地址就是/,如果路由表 包含/ 那就别指定home属性
         "/":(_){
-          // return MainPageDetail();//TODO 擦 我发现这样依然也可以用以前的跳转
-          return MainPageDetailRouter();
+          return MainPageDetailAnimation();
         },
         "/page2":(_)=>Page2()
       },
@@ -139,6 +154,58 @@ class MainPageDetailRouter extends StatelessWidget{
           //TODO ※用路由的形式，async+await模式就行不通了，报错
           Navigator.pushNamed(context, "/page2")
               .then((value) => debugPrint("pushNamed走路由 p=$value"));
+        },
+        child: Text("跳转第二个页面"),
+      ),
+    );
+  }
+
+}
+
+class MainPageDetailAnimation extends StatelessWidget{
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("第一个页面"),
+      ),
+      body: RaisedButton(
+        onPressed: () {
+          Navigator.push(context,
+              PageRouteBuilder(
+                  //动画耗时
+                  transitionDuration: Duration(milliseconds: 500),
+                  //pageBuilder
+                  pageBuilder:
+                  (BuildContext context,
+                  Animation<double> animation,
+                  Animation<double> secondaryAnimation){
+                    //无动画
+                    // return Page2();
+                    //平移动画
+                    // return SlideTransition(
+                    //   //由下往上
+                    //   // position: Tween(begin: Offset(0.0, 1.0),end: Offset(0.0, 0.0))
+                    //   //从左到右
+                    //   position: Tween(begin: Offset(1.0, 0.0),end: Offset(0.0, 0.0))
+                    //       .animate(animation),
+                    //   child: Page2(),
+                    // );
+                    //渐变+平移 TODO 有问题
+                    return FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(
+                              //从左到右
+                              position: Tween(begin: Offset(1.0, 0.0),end: Offset(0.0, 0.0))
+                                  .animate(animation),
+                              child: Page2(),)
+                    );
+                  }))
+              .then((value) => debugPrint("页面跳转动画 p=$value"));
+
+          //TODO 路由的形式，能否用自定义动画呢？
+          // Navigator.pushNamed(context, "/page").then((value) => debugPrint("页面跳转动画 p=$value"));
         },
         child: Text("跳转第二个页面"),
       ),
