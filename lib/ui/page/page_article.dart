@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:banner_view/banner_view.dart';
 import 'package:flutter_app/http/api.dart';
+import 'package:flutter_app/ui/page/page_webview.dart';
 import 'package:flutter_app/ui/widget/article_item.dart';
 
 
@@ -161,7 +162,17 @@ class _ArticlePageState extends State<ArticlePage> {
     //map:转换 ,将List中的每一个条目执行 map方法参数接收的这个方法,这个方法返回T类型，
     //map方法最终会返回一个  Iterable<T>
     List<Widget> list = banners.map((item) {
-      return Image.network(item['imagePath'], fit: BoxFit.cover); //fit 图片充满容器
+      ///InkWell 能让我们快速添加各种触摸事件的widget
+      return InkWell(
+        child: Image.network(item['imagePath'], fit: BoxFit.cover), //fit 图片充满容器
+        ///点击事件
+        onTap: (){
+          ///跳转页面
+          Navigator.of(context).push(new MaterialPageRoute(builder: (context){
+            return WebViewPage(item);
+          }));
+        },
+      );
     }).toList();
     return list.isNotEmpty
         ? BannerView(

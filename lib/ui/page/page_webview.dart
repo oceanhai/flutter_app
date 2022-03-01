@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
@@ -18,6 +19,7 @@ class _WebViewPageState extends State<WebViewPage> {
   void initState() {
     super.initState();
     flutterWebViewPlugin = new FlutterWebviewPlugin();
+    ///webview 状态监听
     flutterWebViewPlugin.onStateChanged.listen((state) {
       if (state.type == WebViewState.finishLoad) {
         // 加载完成
@@ -46,9 +48,13 @@ class _WebViewPageState extends State<WebViewPage> {
           title: Text(widget.data['title']),
           ///appbar下边摆放一个进度条
           bottom: PreferredSize(
+              //提供一个希望的大小
               preferredSize: const Size.fromHeight(1.0),
+              //进度条
               child: const LinearProgressIndicator()),
-          ///透明度
+              //ios 风格进度条 小菊花 TODO 但布局需要调整
+              // child: const CupertinoActivityIndicator()),
+          ///透明度  加载完:全透明 正在加载:不透明
           bottomOpacity: isLoad ? 1.0 : 0.0,
         ),
         withLocalStorage: true, //缓存，数据存储
