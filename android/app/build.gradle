@@ -25,6 +25,9 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
+//利用gradle加载签名配置文件
+def signFile = rootProject.file("sign.properties")
+
 android {
     compileSdkVersion 30
 
@@ -39,6 +42,37 @@ android {
         targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+    }
+
+    //签名
+    signingConfigs {
+        debug {
+            v1SigningEnabled true
+            v2SigningEnabled true
+            try {
+                def signP = getSigningProperties(true, signFile)
+                storeFile file(signP[0])
+                storePassword signP[1]
+                keyAlias signP[2]
+                keyPassword signP[3]
+            } catch (ex) {
+                ex.printStackTrace()
+            }
+        }
+
+        release {
+            v1SigningEnabled true
+            v2SigningEnabled true
+            try {
+                def signP = getSigningProperties(false, signFile)
+                storeFile file(signP[0])
+                storePassword signP[1]
+                keyAlias signP[2]
+                keyPassword signP[3]
+            } catch (ex) {
+                ex.printStackTrace()
+            }
+        }
     }
 
     buildTypes {
@@ -56,4 +90,27 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+
+//读取项目中的sign.properties签名文件，安全
+static String[] getSigningProperties(boolean isDebug, File signFile) {
+    if (signFile.exists()) {
+        def props = new Properties()
+        props.load(new FileInputStream(signFile))
+        if (isDebug) {
+            def signP = new String[4]
+            signP[0] = props['DEBUG_STORE_FILE']
+            signP[1] = props['STORE_PASSWORD']
+            signP[2] = props['KEY_ALIAS']
+            signP[3] = props['KEY_PASSWORD']
+            return signP
+        } else {
+            def signP = new String[4]
+            signP[0] = props['STORE_FILE']
+            signP[1] = props['STORE_PASSWORD']
+            signP[2] = props['KEY_ALIAS']
+            signP[3] = props['KEY_PASSWORD']
+            return signP
+        }
+    }
 }

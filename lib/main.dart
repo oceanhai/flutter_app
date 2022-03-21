@@ -10,7 +10,7 @@ class ArticleApp extends StatelessWidget {
       home: new Scaffold(
         appBar: new AppBar(
           title: new Text(
-            '文章',
+            'wuhai',
             style: const TextStyle(color: Colors.white),
           ),
         ),
